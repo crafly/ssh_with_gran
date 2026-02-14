@@ -278,7 +278,7 @@ def pairwise_test(df, condition_col_index, target_col_index=-1, bins=10,
     results = {}
     for i in unique_values:
         subset = df[df.iloc[:, condition_col_index] == i].iloc[:, target_col_index]
-        print(subset.shape[0],end=",")
+        #print(subset.shape[0],end=",")
         for j in unique_values:
             value1 = i
             value2 = j
@@ -317,6 +317,8 @@ def main():
         res=np.zeros((size,size))
         # 打印结果
         for (value1, value2), result in results.items():
+            if value1 < value2:
+                print("p-value between {:d} and {:d} is {:.4f}".format(value1,value2,result[1]))
             res[value1,value2]=result[1]<0.01
             #res[value2,value1]=result[1]<0.01
         for (value1, value2), result in results.items():
@@ -328,7 +330,7 @@ def main():
                 res[value1,value2]=1
         draw_graph_from_adjacency_matrix(1-res)
         groups=find_connected_components(1-res)
-        print(1.0*np.sum(1-res)/size/size,len(groups),"")
+        #print(1.0*np.sum(1-res)/size/size,len(groups),"")
         #for idx, group in enumerate(groups):
         #    print(f"Group {idx + 1}: {group}")
     except ValueError as e:

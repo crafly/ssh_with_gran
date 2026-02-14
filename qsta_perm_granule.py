@@ -81,28 +81,29 @@ def determine_power(measure,data,condatts,decatts):
     return indexV,strata_entropy,indexV*strata_entropy,p
 
 def search_eqclass(matrix):
-    #Construct a stratifucation using an attribute
-    eqclass = []
-    for i in range(len(matrix)):
-        sublist = []
-        sublist.append(i)
-        for j in range(len(matrix)):
-            # whether all the values are equal
-            a = matrix[i]
-            b = matrix[j]
-            c = (a == b)
-            if (c.all()) and i != j:
-                sublist.append(j)
-        eqclass.append(sublist)
-    for item in eqclass:
-        item.sort()
-    demon = list(set(tuple(t) for t in eqclass))
-    eqcls_end = [list(v) for v in demon]
-    eqc_no=np.zeros((len(matrix)))
-    for c_no in range(len(eqcls_end)):
-        for obj in eqcls_end[c_no]:
-            eqc_no[obj]=c_no
-    return eqcls_end,eqc_no
+    """
+    Construct a stratification using an attribute - optimized version
+    """
+    # 将矩阵的每一行转换为可哈希的元组，便于分组
+    rows_as_tuples = [tuple(row) for row in matrix]
+    
+    # 使用字典来存储等价类，键为行的值，值为索引列表
+    eqclass_dict = {}
+    for idx, row_tuple in enumerate(rows_as_tuples):
+        if row_tuple not in eqclass_dict:
+            eqclass_dict[row_tuple] = []
+        eqclass_dict[row_tuple].append(idx)
+    
+    # 提取等价类
+    eqcls_end = list(eqclass_dict.values())
+    
+    # 构建 eqc_no 数组
+    eqc_no = np.zeros(len(matrix))
+    for c_no, indices in enumerate(eqcls_end):
+        for obj in indices:
+            eqc_no[obj] = c_no
+            
+    return eqcls_end, eqc_no
 
 if __name__ == "__main__":
     if len(sys.argv)<4:
